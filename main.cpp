@@ -31,7 +31,7 @@ void AStar( std::vector< std::vector< Point > > grid, Point start, Point end )
 	while( cur->getPos() != end.getPos() )
 	{
 
-
+		
 
 	}
 
