@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "point.cpp"
+#include "heapsort.cpp"
 
 void Reshape( GLFWwindow *wind, int width, int height )
 {
@@ -18,20 +19,26 @@ void Reshape( GLFWwindow *wind, int width, int height )
 
 }
 
-void AStar( std::vector< std::vector< Point > > grid, Point start, Point end )
+void AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
 {
 
 	Point *cur = &start;
 
-	std::vector< Point > closed;
-	std::vector< Point > open;
+	std::vector< Point* > closed;
+	std::vector< Point* > open;
 
-	open.push_back( start );
+	open.push_back( &start );
 
-	while( cur->getPos() != end.getPos() )
+	while( open.size() > 0 )
 	{
 
-		
+		if( cur->getPos() == end.getPos() )
+		{
+
+			cur = new Point( end.getPos().x, end.getPos().y, 0, cur );
+			break;
+
+		}
 
 	}
 
@@ -39,8 +46,6 @@ void AStar( std::vector< std::vector< Point > > grid, Point start, Point end )
 
 int main()
 {
-
-	Point test( 0, 0, 0, nullptr );
 
 	glfwInit();
 	GLFWwindow *wind = glfwCreateWindow( 800, 600, "A* Pathfinding", nullptr, nullptr );

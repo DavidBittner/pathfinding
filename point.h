@@ -9,6 +9,20 @@ struct Coord
 
 	float x, y;
 
+	bool operator!=( Coord const b ) const
+	{
+
+		return ( this->x == b.x && this->y == b.y );
+
+	}
+
+	bool operator==( Coord const b ) const
+	{
+
+		return( this->x == b.x && this->y == b.y );
+
+	}
+
 };
 
 Coord::Coord( float x, float y )
@@ -35,12 +49,15 @@ class Point
 		Point();
 		Point( int x, int y, int cost );
 
-		Point *getParent();
-		void  *setParent( Point *parent );
+		Point *getParent(){ return _parent; }
+		void  *setParent( Point *parent ){ _parent = parent; }
 
-		Coord getPos();
+		int manhattanDistance( Coord pos );
 
-		bool operator>( const &Point b ){ return (this->_cost > b->_cost); }
+		Coord getPos(){ return _pos; }
+		int getCost(){ return _cost; }
+
+		bool operator>( Point const b ) const;
 
 	private:
 		Coord _pos;
