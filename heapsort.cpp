@@ -12,7 +12,7 @@ std::vector<T> heapsort( std::vector<T> data )
 	while( sortedNums < amountOfVals )
 	{
 
-		T max;
+		T max = data.at(0);
 		int maxAdr = 0;
 
 		for( int i = 0; i < amountOfVals-sortedNums; i++ )

@@ -29,7 +29,43 @@ int manhattan( Coord a, Coord b )
 
 }
 
-void AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
+void DrawPath( std::vector<Coord> in )
+{
+
+	std::vector<float> coords;
+	float w = 32;
+
+	for( int i = 0; i < in.size(); i++ )
+	{
+
+		int posX = in.at( i ).x*32;
+		int posY = in.at( i ).y*32;
+
+		coords.push_back( posX );
+		coords.push_back( posY );
+
+		coords.push_back( posX+w );
+		coords.push_back( posY );
+
+		coords.push_back( posX+w );
+		coords.push_back( posY+w );
+
+		coords.push_back( posX );
+		coords.push_back( posY+w );
+
+
+	}
+
+	glEnableClientState( GL_VERTEX_ARRAY );
+
+	glVertexPointer( 2, GL_FLOAT, 0, coords.data() );
+	glDrawArrays( GL_QUADS, 0, coords.size()/2 );
+
+	glDisableClientState( GL_VERTEX_ARRAY );
+
+}
+
+std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
 {
 
 	Point *cur;
@@ -47,7 +83,6 @@ void AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
 		if( cur->getPos() == end.getPos() )
 		{
 
-			cur = new Point( end.getPos().x, end.getPos().y, 0, cur );
 			break;
 
 		}
@@ -61,6 +96,8 @@ void AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
 				int curX = cur->getPos().x+x;
 				int curY = cur->getPos().y+y;
 
+				int movCost = 10;
+
 				Coord temp( curX, curY );
 
 				bool make = true;
@@ -72,6 +109,7 @@ void AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
 					{
 
 						make = false;
+						break;
 
 					}
 
@@ -84,15 +122,23 @@ void AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
 					{
 
 						make = false;
+						break;
 
 					}
+
+				}
+
+				if( temp.x < 0 || temp.y < 0 )
+				{
+
+					continue;
 
 				}
 
 				if( make )
 				{
 		
-					open.push_back( new Point( curX, curY, manhattan( cur->getPos(), temp ), cur ) );
+					open.push_back( new Point( temp.x, temp.y, manhattan( end.getPos(), temp ), cur ) );
 
 				}
 		
@@ -107,18 +153,33 @@ void AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
 
 	}
 
+	std::vector<Coord> path;
+
+	while( cur->getParent() != nullptr )
+	{
+
+		path.push_back( cur->getPos() );
+		cur = cur->getParent();
+		
+	}
+
+	path.push_back( cur->getPos() );
+
+	return path;
+
 }
 
 int main()
 {
 
-	std::vector< std::vector< bool > > a;
-
+	std::vector<std::vector<bool>> map( 500, std::vector<bool>(500) );
+	std::vector< Coord > path;
+	
 	Point start( 1, 1, 0, nullptr );
-	Point end( 5, 1, 0, nullptr );
+	Point end( 5, 15, 0, nullptr );
 
-	AStar( a, start, end );
-
+	path = AStar( map, start, end );
+	
 	glfwInit();
 	GLFWwindow *wind = glfwCreateWindow( 800, 600, "A* Pathfinding", nullptr, nullptr );
 
@@ -134,6 +195,7 @@ int main()
 		glLoadIdentity();
 
 		glTranslatef( 0.0f, 0.0f, -1.0f );
+		DrawPath( path );
 
 		glfwPollEvents();
 		glfwSwapBuffers( wind );
