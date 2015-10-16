@@ -120,7 +120,7 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 					(y ==  1 && x ==  1))
 				{
 
-					movCost = 14;
+					movCost = 10;
 
 				}
 
@@ -164,6 +164,7 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 				if( grid.at(temp.x).at(temp.y) )
 				{
 
+					std::cout << temp.x << "," << temp.y << std::endl;
 					continue;
 
 				}
@@ -171,7 +172,7 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 				if( make )
 				{
 		
-					open.push_back( new Point( temp.x, temp.y, manhattan( start.getPos(), temp )+manhattan( end.getPos(), temp )+movCost, cur ) );
+					open.push_back( new Point( temp.x, temp.y, manhattan( end.getPos(), temp )+movCost, cur ) );
 
 				}
 		
@@ -211,10 +212,10 @@ int main()
 	Point *start = new Point( 5, 1, 0, nullptr );
 	Point *end = new Point( 5, 15, 0, nullptr );
 
-	for( int i = 0; i < 150; i++ )
+	for( int i = 0; i < 15; i++ )
 	{
 
-		map.at(i).at(10) = true;
+		map.at(i).at(3) = true;
 
 	}
 
