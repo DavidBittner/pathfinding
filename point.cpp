@@ -1,4 +1,21 @@
+#include <cmath>
 #include "point.h"
+
+Coord::Coord( float x, float y )
+{
+
+	this->x = x;
+	this->y = y;
+
+}
+
+Coord::Coord()
+{
+
+	this->x = 0;
+	this->y = 0;
+
+}
 
 Point::Point( int x, int y, int cost, Point *parent )
 {
@@ -43,12 +60,9 @@ bool Point::operator>( Point const b ) const
 
 }
 
-int Point::manhattanDistance( Coord pos )
+bool Point::operator<( Point const b ) const
 {
 
-	int x = abs( pos.x - _pos.x );
-	int y = abs( pos.y - _pos.y );
-
-	return x+y;
+	return( this->_cost < b._cost );
 
 }

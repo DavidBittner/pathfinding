@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "point.cpp"
+#include "point.h"
 #include "heapsort.cpp"
 
 void Reshape( GLFWwindow *wind, int width, int height )
@@ -22,17 +22,18 @@ void Reshape( GLFWwindow *wind, int width, int height )
 int manhattan( Coord a, Coord b )
 {
 
-	int x = abs(b.x-a.x);
-	int y = abs(b.y-a.y);
+	int x = b.x-a.x;
+	int y = b.y-a.y;
 
 	return x+y;
 
 }
 
-void DrawPath( std::vector<Coord> in )
+void DrawPath( std::vector<Coord> in, std::vector< std::vector<bool> > map )
 {
 
 	std::vector<float> coords;
+	std::vector<float> colors;
 	float w = 32;
 
 	for( int i = 0; i < in.size(); i++ )
@@ -53,15 +54,39 @@ void DrawPath( std::vector<Coord> in )
 		coords.push_back( posX );
 		coords.push_back( posY+w );
 
+		for( int j = 0; j < 4; j++ )
+		{
 
+			colors.push_back( 0.4f );
+			colors.push_back( 0.4f );
+			colors.push_back( 0.4f );
+
+		}
 	}
 
 	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_COLOR_ARRAY );
 
 	glVertexPointer( 2, GL_FLOAT, 0, coords.data() );
+	glColorPointer( 3, GL_FLOAT, 0, colors.data() );
 	glDrawArrays( GL_QUADS, 0, coords.size()/2 );
 
+	glDisableClientState( GL_COLOR_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );
+
+	coods.clear();
+	colors.clear();
+
+	for( int y = 0; y < map.size(); y++ )
+	{
+
+		for( int x = 0; x < map.at(y).size(); x++ )
+		{
+
+			
+			
+		}
+	}
 
 }
 
@@ -97,6 +122,16 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 				int curY = cur->getPos().y+y;
 
 				int movCost = 10;
+
+				if( (y == -1 && x == -1)||
+					(y ==  1 && x == -1)||
+					(y == -1 && x ==  1)||
+					(y ==  1 && x ==  1))
+				{
+
+					movCost = 14;
+
+				}
 
 				Coord temp( curX, curY );
 
@@ -135,10 +170,17 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 
 				}
 
+				if( grid.at(temp.x).at(temp.y) )
+				{
+
+					continue;
+
+				}
+
 				if( make )
 				{
 		
-					open.push_back( new Point( temp.x, temp.y, manhattan( end.getPos(), temp ), cur ) );
+					open.push_back( new Point( temp.x, temp.y, manhattan( start.getPos(), temp )+manhattan( end.getPos(), temp )+movCost, cur ) );
 
 				}
 		
@@ -146,11 +188,23 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 
 		}
 
-		closed.push_back( open.at(0) );
+		closed.push_back( cur );
 		open.erase( open.begin() );
 
 		open = heapsort( open );
 
+		/*
+		for( int i = 0; i < open.size(); i++ )
+		{
+
+			std::cout << open.at(i)->getCost() << std::endl;
+
+		}
+		std::cout << std::endl;
+
+		std::cin.get();
+		*/
+	
 	}
 
 	std::vector<Coord> path;
@@ -176,10 +230,10 @@ int main()
 	std::vector< Coord > path;
 	
 	Point start( 1, 1, 0, nullptr );
-	Point end( 5, 15, 0, nullptr );
+	Point end( 25, 7, 0, nullptr );
 
 	path = AStar( map, start, end );
-	
+
 	glfwInit();
 	GLFWwindow *wind = glfwCreateWindow( 800, 600, "A* Pathfinding", nullptr, nullptr );
 
@@ -195,6 +249,7 @@ int main()
 		glLoadIdentity();
 
 		glTranslatef( 0.0f, 0.0f, -1.0f );
+		
 		DrawPath( path );
 
 		glfwPollEvents();

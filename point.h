@@ -25,22 +25,6 @@ struct Coord
 
 };
 
-Coord::Coord( float x, float y )
-{
-
-	this->x = x;
-	this->y = y;
-
-}
-
-Coord::Coord()
-{
-
-	this->x = 0;
-	this->y = 0;
-
-}
-
 class Point
 {
 
@@ -52,12 +36,11 @@ class Point
 		Point *getParent(){ return _parent; }
 		void  *setParent( Point *parent ){ _parent = parent; }
 
-		int manhattanDistance( Coord pos );
-
 		Coord getPos(){ return _pos; }
 		int getCost(){ return _cost; }
 
 		bool operator>( Point const b ) const;
+		bool operator<( Point const b ) const;
 
 	private:
 		Coord _pos;

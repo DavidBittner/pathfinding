@@ -1,9 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-
-template<class T>
-std::vector<T> heapsort( std::vector<T> data )
+std::vector<Point*> heapsort( std::vector<Point*> data )
 {
 
 	int amountOfVals = data.size();
@@ -12,13 +7,13 @@ std::vector<T> heapsort( std::vector<T> data )
 	while( sortedNums < amountOfVals )
 	{
 
-		T max = data.at(0);
+		Point* max = data.at(0);
 		int maxAdr = 0;
 
 		for( int i = 0; i < amountOfVals-sortedNums; i++ )
 		{
 
-			if( data.at(i) > max )
+			if( *data.at(i) > *max )
 			{
 
 				max = data.at(i);
