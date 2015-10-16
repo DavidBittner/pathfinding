@@ -2,6 +2,8 @@
 #include <iostream>
 
 #include <vector>
+#include <chrono>
+#include <thread>
 
 #include "point.h"
 #include "heapsort.cpp"
@@ -22,14 +24,14 @@ void Reshape( GLFWwindow *wind, int width, int height )
 int manhattan( Coord a, Coord b )
 {
 
-	int x = b.x-a.x;
-	int y = b.y-a.y;
+	int x = abs(b.x-a.x);
+	int y = abs(b.y-a.y);
 
 	return x+y;
 
 }
 
-void DrawPath( std::vector<Coord> in, std::vector< std::vector<bool> > map )
+void DrawPath( std::vector<Coord> in )
 {
 
 	std::vector<float> coords;
@@ -74,19 +76,8 @@ void DrawPath( std::vector<Coord> in, std::vector< std::vector<bool> > map )
 	glDisableClientState( GL_COLOR_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );
 
-	coods.clear();
+	coords.clear();
 	colors.clear();
-
-	for( int y = 0; y < map.size(); y++ )
-	{
-
-		for( int x = 0; x < map.at(y).size(); x++ )
-		{
-
-			
-			
-		}
-	}
 
 }
 
@@ -192,18 +183,6 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 		open.erase( open.begin() );
 
 		open = heapsort( open );
-
-		/*
-		for( int i = 0; i < open.size(); i++ )
-		{
-
-			std::cout << open.at(i)->getCost() << std::endl;
-
-		}
-		std::cout << std::endl;
-
-		std::cin.get();
-		*/
 	
 	}
 
@@ -229,12 +208,20 @@ int main()
 	std::vector<std::vector<bool>> map( 500, std::vector<bool>(500) );
 	std::vector< Coord > path;
 	
-	Point start( 1, 1, 0, nullptr );
-	Point end( 25, 7, 0, nullptr );
+	Point *start = new Point( 5, 1, 0, nullptr );
+	Point *end = new Point( 5, 15, 0, nullptr );
 
-	path = AStar( map, start, end );
+	for( int i = 0; i < 150; i++ )
+	{
+
+		map.at(i).at(10) = true;
+
+	}
+
+	path = AStar( map, *start, *end );
 
 	glfwInit();
+	DrawPath( path );
 	GLFWwindow *wind = glfwCreateWindow( 800, 600, "A* Pathfinding", nullptr, nullptr );
 
 	glfwMakeContextCurrent( wind );
@@ -242,15 +229,20 @@ int main()
 
 	glfwSetWindowSizeCallback( wind, Reshape );
 
+	srand( time(nullptr) );
+
 	while( !glfwWindowShouldClose( wind ) )
 	{
 
+		DrawPath( path );
 		glClear( GL_COLOR_BUFFER_BIT );
 		glLoadIdentity();
 
 		glTranslatef( 0.0f, 0.0f, -1.0f );
 		
 		DrawPath( path );
+
+		std::this_thread::sleep_for( std::chrono::milliseconds(17) );
 
 		glfwPollEvents();
 		glfwSwapBuffers( wind );
