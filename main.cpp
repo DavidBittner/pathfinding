@@ -5,8 +5,10 @@
 #include <chrono>
 #include <thread>
 
+#include "mouse.cpp"
 #include "point.h"
 #include "heapsort.cpp"
+#include "draw.cpp"
 
 void Reshape( GLFWwindow *wind, int width, int height )
 {
@@ -31,57 +33,7 @@ int manhattan( Coord a, Coord b )
 
 }
 
-void DrawPath( std::vector<Coord> in )
-{
-
-	std::vector<float> coords;
-	std::vector<float> colors;
-	float w = 32;
-
-	for( int i = 0; i < in.size(); i++ )
-	{
-
-		int posX = in.at( i ).x*32;
-		int posY = in.at( i ).y*32;
-
-		coords.push_back( posX );
-		coords.push_back( posY );
-
-		coords.push_back( posX+w );
-		coords.push_back( posY );
-
-		coords.push_back( posX+w );
-		coords.push_back( posY+w );
-
-		coords.push_back( posX );
-		coords.push_back( posY+w );
-
-		for( int j = 0; j < 4; j++ )
-		{
-
-			colors.push_back( 0.4f );
-			colors.push_back( 0.4f );
-			colors.push_back( 0.4f );
-
-		}
-	}
-
-	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_COLOR_ARRAY );
-
-	glVertexPointer( 2, GL_FLOAT, 0, coords.data() );
-	glColorPointer( 3, GL_FLOAT, 0, colors.data() );
-	glDrawArrays( GL_QUADS, 0, coords.size()/2 );
-
-	glDisableClientState( GL_COLOR_ARRAY );
-	glDisableClientState( GL_VERTEX_ARRAY );
-
-	coords.clear();
-	colors.clear();
-
-}
-
-std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, Point end )
+std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, Point end )
 {
 
 	Point *cur;
@@ -161,10 +113,9 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 
 				}
 
-				if( grid.at(temp.x).at(temp.y) )
+				if( grid.at(temp.x).at(temp.y) == 0 )
 				{
 
-					std::cout << temp.x << "," << temp.y << std::endl;
 					continue;
 
 				}
@@ -172,7 +123,7 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 				if( make )
 				{
 		
-					open.push_back( new Point( temp.x, temp.y, manhattan( end.getPos(), temp )+movCost, cur ) );
+					open.push_back( new Point( temp.x, temp.y, manhattan( end.getPos(), temp )+movCost+grid[temp.x][temp.y], cur ) );
 
 				}
 		
@@ -206,20 +157,12 @@ std::vector<Coord> AStar( std::vector< std::vector< bool > > grid, Point start, 
 int main()
 {
 
-	std::vector<std::vector<bool>> map( 500, std::vector<bool>(500) );
 	std::vector< Coord > path;
 	
 	Point *start = new Point( 5, 1, 0, nullptr );
-	Point *end = new Point( 5, 15, 0, nullptr );
+	Point *end = new Point( 25, 15, 0, nullptr );
 
-	for( int i = 0; i < 15; i++ )
-	{
-
-		map.at(i).at(3) = true;
-
-	}
-
-	path = AStar( map, *start, *end );
+	path = AStar( walls, *start, *end );
 
 	glfwInit();
 	DrawPath( path );
@@ -229,22 +172,38 @@ int main()
 	Reshape( wind, 800, 600 );
 
 	glfwSetWindowSizeCallback( wind, Reshape );
+	glfwSetCursorPosCallback( wind, mousePosCallBack );
+	glfwSetMouseButtonCallback( wind, mouseClickCallBack );
 
 	srand( time(nullptr) );
+
+	for( int y = 0; y < walls.size(); y++ )
+	{
+
+		for( int x = 0; x < walls[y].size(); x++ )
+		{
+
+			walls[x][y] = 1;
+
+		}
+
+	}
 
 	while( !glfwWindowShouldClose( wind ) )
 	{
 
-		DrawPath( path );
 		glClear( GL_COLOR_BUFFER_BIT );
 		glLoadIdentity();
 
 		glTranslatef( 0.0f, 0.0f, -1.0f );
 		
+		path = AStar( walls, *start, *end );
+		DrawMap();
 		DrawPath( path );
 
 		std::this_thread::sleep_for( std::chrono::milliseconds(17) );
 
+		//ResetKeys();
 		glfwPollEvents();
 		glfwSwapBuffers( wind );
 
