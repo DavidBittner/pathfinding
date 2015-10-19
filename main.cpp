@@ -43,6 +43,8 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 	open.push_back( &start );
 
+	bool error = true;
+
 	while( open.size() > 0 )
 	{
 
@@ -51,6 +53,7 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 		if( cur->getPos() == end.getPos() )
 		{
 
+			error = false;
 			break;
 
 		}
@@ -77,6 +80,20 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 				}
 
 				Coord temp( curX, curY );
+
+				if( curY >= grid.size() )
+				{
+
+					continue;
+
+				}
+
+				if( curX >= grid[0].size() )
+				{
+
+					continue;
+
+				}
 
 				bool make = true;
 
@@ -139,6 +156,13 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 	}
 
 	std::vector<Coord> path;
+
+	if( error )
+	{
+
+		return path;
+
+	}
 
 	while( cur->getParent() != nullptr )
 	{

@@ -12,7 +12,7 @@ Coord mousePos;
 bool mouseLeft = false;
 bool mouseRight = false;
 
-float w = 32.0f;
+float w = 16.0f;
 
 std::vector< std::vector<int> > walls( 50, std::vector<int>(50) );
 
