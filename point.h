@@ -41,6 +41,7 @@ class Point
 
 		bool operator>( Point const b ) const;
 		bool operator<( Point const b ) const;
+		bool operator>=( Point const b ) const;
 
 	private:
 		Coord _pos;

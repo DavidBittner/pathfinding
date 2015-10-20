@@ -75,17 +75,18 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 					(y ==  1 && x ==  1))
 				{
 
-					movCost = 10;
+					movCost = 16;
+					//continue;
 
 				}
 
 				Coord temp( curX, curY );
+				bool make = true;
 
 				if( curY >= grid.size() )
 				{
 
 					continue;
-
 				}
 
 				if( curX >= grid[0].size() )
@@ -95,7 +96,6 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 				}
 
-				bool make = true;
 
 				for( int i = 0; i < open.size(); i++ )
 				{
@@ -126,21 +126,26 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 				if( temp.x < 0 || temp.y < 0 )
 				{
 
-					continue;
+					make = false;
 
 				}
 
 				if( grid.at(temp.x).at(temp.y) == 0 )
 				{
 
-					continue;
+					make = false;
 
 				}
 
 				if( make )
 				{
-		
-					open.push_back( new Point( temp.x, temp.y, manhattan( end.getPos(), temp )+movCost+grid[temp.x][temp.y], cur ) );
+
+					int gScore = manhattan( start.getPos(), cur->getPos() );
+					int hScore = manhattan( end.getPos(), cur->getPos() );
+					int tileCost = grid[curX][curY];
+					int fScore = gScore+hScore+tileCost;
+
+					open.push_back( new Point( temp.x, temp.y, fScore, cur ) );
 
 				}
 		
@@ -184,9 +189,7 @@ int main()
 	std::vector< Coord > path;
 	
 	Point *start = new Point( 5, 1, 0, nullptr );
-	Point *end = new Point( 25, 15, 0, nullptr );
-
-	path = AStar( walls, *start, *end );
+	Point *end = new Point( 5, 15, 0, nullptr );
 
 	glfwInit();
 	DrawPath( path );

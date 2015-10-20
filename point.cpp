@@ -66,3 +66,10 @@ bool Point::operator<( Point const b ) const
 	return( this->_cost < b._cost );
 
 }
+
+bool Point::operator>=( Point const b ) const
+{
+
+	return( this->_cost >= b._cost );
+
+}
