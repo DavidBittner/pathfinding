@@ -28,8 +28,12 @@ int manhattan( Coord a, Coord b )
 
 	int x = abs(b.x-a.x);
 	int y = abs(b.y-a.y);
-
 	return x+y;
+
+	//float x = pow( a.x-b.x, 2 );
+	//float y = pow( a.y-b.y, 2 );
+
+	//return round(sqrt( x+y ));
 
 }
 
@@ -75,26 +79,20 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 					(y ==  1 && x ==  1))
 				{
 
-					movCost = 13;
+					movCost = 14;
+					//continue;
 
 				}
 
 				Coord temp( curX, curY );
 				bool make = true;
 
-				if( curY >= grid.size() )
+				if( curY >= grid.size() || 
+					curX >= grid.size() )
 				{
 
 					continue;
 				}
-
-				if( curX >= grid[0].size() )
-				{
-
-					continue;
-
-				}
-
 
 				for( int i = 0; i < open.size(); i++ )
 				{
@@ -122,14 +120,8 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 				}
 
-				if( temp.x < 0 || temp.y < 0 )
-				{
-
-					continue;
-
-				}
-
-				if( grid.at(temp.x).at(temp.y) == 0 )
+				if( (grid.at(temp.x).at(temp.y) == 0 ) ||
+					( temp.x<0 || temp.y < 0 ) )
 				{
 
 					continue;
@@ -139,10 +131,10 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 				if( make )
 				{
 
-					int gScore = manhattan( start.getPos(), temp );
-					int hScore = manhattan( end.getPos(), temp );
-					int tileCost = grid[curX][curY]+movCost;
-					int fScore = gScore+hScore;
+					int gScore = manhattan( start.getPos(), Coord( curX, curY ) );
+					int hScore = manhattan( end.getPos(), Coord( curX, curY ) );
+					int tileCost = grid[curX][curY];
+					int fScore = gScore+hScore+tileCost;
 
 					open.push_back( new Point( curX, curY, fScore, cur ) );
 
@@ -156,15 +148,6 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 		open.erase( open.begin() );
 
 		open = heapsort( open );
-
-		for( int i = 0; i < open.size(); i++ )
-		{
-
-			std::cout << open.at(i)->getCost() << std::endl;
-
-		}
-	
-		//std::cin.get();
 
 	}
 
