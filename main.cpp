@@ -75,8 +75,7 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 					(y ==  1 && x ==  1))
 				{
 
-					movCost = 16;
-					//continue;
+					movCost = 13;
 
 				}
 
@@ -126,26 +125,26 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 				if( temp.x < 0 || temp.y < 0 )
 				{
 
-					make = false;
+					continue;
 
 				}
 
 				if( grid.at(temp.x).at(temp.y) == 0 )
 				{
 
-					make = false;
+					continue;
 
 				}
 
 				if( make )
 				{
 
-					int gScore = manhattan( start.getPos(), cur->getPos() );
-					int hScore = manhattan( end.getPos(), cur->getPos() );
-					int tileCost = grid[curX][curY];
-					int fScore = gScore+hScore+tileCost;
+					int gScore = manhattan( start.getPos(), temp );
+					int hScore = manhattan( end.getPos(), temp );
+					int tileCost = grid[curX][curY]+movCost;
+					int fScore = gScore+hScore;
 
-					open.push_back( new Point( temp.x, temp.y, fScore, cur ) );
+					open.push_back( new Point( curX, curY, fScore, cur ) );
 
 				}
 		
@@ -157,7 +156,16 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 		open.erase( open.begin() );
 
 		open = heapsort( open );
+
+		for( int i = 0; i < open.size(); i++ )
+		{
+
+			std::cout << open.at(i)->getCost() << std::endl;
+
+		}
 	
+		//std::cin.get();
+
 	}
 
 	std::vector<Coord> path;
@@ -223,7 +231,7 @@ int main()
 		glLoadIdentity();
 
 		glTranslatef( 0.0f, 0.0f, -1.0f );
-		
+
 		path = AStar( walls, *start, *end );
 		DrawMap();
 		DrawPath( path );
