@@ -30,28 +30,28 @@ int manhattan( Coord a, Coord b )
 	int y = abs(b.y-a.y);
 	return x+y;
 
-	//float x = pow( a.x-b.x, 2 );
-	//float y = pow( a.y-b.y, 2 );
-
-	//return round(sqrt( x+y ));
-
 }
 
 std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, Point end )
 {
 
+	//The current 'focal' point.
 	Point *cur;
 
+	//The open and closed lists.
 	std::vector< Point* > closed;
 	std::vector< Point* > open;
 
+	//Start by adding the starting position to the list.
 	open.push_back( &start );
 
+	//Just so it knows whether or not to try and reconstruct a path.
 	bool error = true;
 
 	while( open.size() > 0 )
 	{
 
+		//The current point is the first entry in the open list.
 		cur = open.at(0);
 
 		if( cur->getPos() == end.getPos() )
@@ -62,6 +62,7 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 		}
 
+		//Add in all the neighbors of the current point.
 		for( int y = -1; y <= 1; y++ )
 		{
 
@@ -73,6 +74,7 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 				int movCost = 10;
 
+				//If it is a diagonal, make it cost 14 instead of 10.
 				if( (y == -1 && x == -1)||
 					(y ==  1 && x == -1)||
 					(y == -1 && x ==  1)||
@@ -87,6 +89,7 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 				Coord temp( curX, curY );
 				bool make = true;
 
+				//If it is outside the range of the map, continue.
 				if( curY >= grid.size() || 
 					curX >= grid.size() )
 				{
@@ -94,6 +97,12 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 					continue;
 				}
 
+				/*
+
+				These two loops are to check whether or not the point's neighbors already exist.
+				This feels really sloppy to me. Please tell me if there is a better way.
+
+				*/
 				for( int i = 0; i < open.size(); i++ )
 				{
 
@@ -120,6 +129,7 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 				}
 
+				//If the point in the map is a zero, then it is a wall. Continue.
 				if( (grid.at(temp.x).at(temp.y) == 0 ) ||
 					( temp.x<0 || temp.y < 0 ) )
 				{
@@ -128,13 +138,14 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 				}
 
+				//If it is allowed to make a new point, it adds it to the open list.
 				if( make )
 				{
 
-					int gScore = manhattan( start.getPos(), Coord( curX, curY ) );
+					int gScore = cur->getCost();
 					int hScore = manhattan( end.getPos(), Coord( curX, curY ) );
 					int tileCost = grid[curX][curY];
-					int fScore = gScore+hScore+tileCost;
+					int fScore = gScore+hScore+tileCost+movCost;
 
 					open.push_back( new Point( curX, curY, fScore, cur ) );
 
@@ -144,9 +155,11 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 		}
 
+		//It then pushes back the current into the closed set as well as erasing it from the open set.
 		closed.push_back( cur );
 		open.erase( open.begin() );
 
+		//Heapsort works, guranteed. Not sure if it's a stable sort, though. From what I can tell that shouldn't matter, though.
 		open = heapsort( open );
 
 	}
@@ -160,6 +173,7 @@ std::vector<Coord> AStar( std::vector< std::vector< int > > grid, Point start, P
 
 	}
 
+	//Reconstruct a path by tracing through the parents.
 	while( cur->getParent() != nullptr )
 	{
 
